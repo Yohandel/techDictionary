@@ -50,7 +50,7 @@ const techDictionary = [
   { id: 49, term: "Virtual Machine" },
   { id: 50, term: "Webpack" }
 ];
-
+   
 
 function displayTermsInTable(terms) {
   const table = document.getElementById('termTable');
