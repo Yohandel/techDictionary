@@ -55,12 +55,25 @@ const techDictionary = [
 function displayTermsInTable(terms) {
   const table = document.getElementById('termTable');
   const tbody = table.querySelector('tbody');
-  
+
+  tbody.innerHTML = "";
+
   terms.forEach(item => {
     const row = tbody.insertRow();
     row.insertCell(0).textContent = item.id;
     row.insertCell(1).textContent = item.term;
   });
 }
+
+function filterTerms() {
+    const text = searchInput.value.toLowerCase();
+    const filtered = techDictionary.filter(item => 
+        item.term.toLowerCase().includes(text)
+    );
+    
+    displayTermsInTable(filtered);
+}
+
+searchInput.addEventListener('input', filterTerms);
 
 displayTermsInTable(techDictionary);
