@@ -50,30 +50,79 @@ const techDictionary = [
   { id: 49, term: "Virtual Machine" },
   { id: 50, term: "Webpack" }
 ];
-   
+     
+// Estado de la paginación
+let currentPage = 1;
+let rowsPerPage = 5;
+let filteredData = [...techDictionary];
 
-function displayTermsInTable(terms) {
-  const table = document.getElementById('termTable');
-  const tbody = table.querySelector('tbody');
+const searchInput = document.getElementById('searchInput');
+const itemsPerPageSelect = document.getElementById('itemsPerPage');
+const paginationContainer = document.getElementById('paginationControls');
 
-  tbody.innerHTML = "";
+function displayTermsInTable() {
+    const tableBody = document.querySelector('#termTable tbody');
+    tableBody.innerHTML = "";
 
-  terms.forEach(item => {
-    const row = tbody.insertRow();
-    row.insertCell(0).textContent = item.id;
-    row.insertCell(1).textContent = item.term;
-  });
+    // Calcular límites
+    let dataToShow = filteredData;
+    
+    if (rowsPerPage !== "all") {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + parseInt(rowsPerPage);
+        dataToShow = filteredData.slice(start, end);
+    }
+
+    dataToShow.forEach(item => {
+        const row = tableBody.insertRow();
+        row.insertCell(0).textContent = item.id;
+        row.insertCell(1).textContent = item.term;
+    });
+
+    setupPagination();
 }
 
-function filterTerms() {
+function setupPagination() {
+    paginationContainer.innerHTML = "";
+    if (rowsPerPage === "all") return;
+
+    const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+    
+    for (let i = 1; i <= pageCount; i++) {
+        const li = document.createElement('li');
+        li.classList.add('page-item');
+        if (i === currentPage) li.classList.add('active');
+
+        const btn = document.createElement('button');
+        btn.classList.add('page-link');
+        btn.innerText = i;
+        
+        btn.addEventListener('click', () => {
+            currentPage = i;
+            displayTermsInTable();
+        });
+
+        li.appendChild(btn);
+        paginationContainer.appendChild(li);
+    }
+}
+
+// Evento de búsqueda
+searchInput.addEventListener('input', () => {
     const text = searchInput.value.toLowerCase();
-    const filtered = techDictionary.filter(item => 
+    filteredData = techDictionary.filter(item => 
         item.term.toLowerCase().includes(text)
     );
-    
-    displayTermsInTable(filtered);
-}
+    currentPage = 1; // Reiniciar a la primera página al buscar
+    displayTermsInTable();
+});
 
-searchInput.addEventListener('input', filterTerms);
+// Evento de cambio de cantidad por página
+itemsPerPageSelect.addEventListener('change', (e) => {
+    rowsPerPage = e.target.value === "all" ? "all" : parseInt(e.target.value);
+    currentPage = 1; // Reiniciar a la primera página
+    displayTermsInTable();
+});
 
-displayTermsInTable(techDictionary);
+// Inicialización
+displayTermsInTable();
